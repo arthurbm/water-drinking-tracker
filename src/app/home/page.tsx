@@ -1,7 +1,12 @@
 import { auth, signOut } from '@/app/auth';
+import { redirect } from 'next/navigation';
 
 export default async function ProtectedPage() {
   let session = await auth();
+
+  if (!session) {
+    redirect('/login');
+  }
 
   return (
     <div className="flex h-screen bg-black">
