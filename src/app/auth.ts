@@ -1,8 +1,8 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { compare } from 'bcrypt-ts';
-import { getUser } from '@/lib/db';
 import { authConfig } from '@/app/auth.config';
+import { getUser } from '@/lib/actions';
 
 export const {
   handlers: { GET, POST },
