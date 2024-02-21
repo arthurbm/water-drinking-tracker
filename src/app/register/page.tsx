@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Form } from "@/app/form";
-import { SubmitButton } from "@/app/submit-button";
+import { SubmitButton } from "@/components/submit-button";
 import { createUser, getUser } from "@/lib/db";
 
 export default function Login() {
