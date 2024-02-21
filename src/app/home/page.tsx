@@ -10,12 +10,9 @@ export default async function ProtectedPage() {
   }
 
   return (
-    <div className="flex h-screen bg-black">
-      <div className="flex h-screen w-screen flex-col items-center justify-center space-y-5 text-white">
-        You are logged in as {session?.user?.email}
-        <HydrationTracker />
-        <SignOut />
-      </div>
+    <div className="flex flex-col justify-center min-h-screen">
+      <HydrationTracker />
+      <SignOut />
     </div>
   );
 }

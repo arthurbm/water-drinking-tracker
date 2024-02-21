@@ -29,11 +29,4 @@ export const waterIntakesRelations = relations(waterIntakes, ({ one }) => ({
   }),
 }));
 
-export const db = drizzle(sql, {
-  schema: {
-    users,
-    usersRelations,
-    waterIntakes,
-    waterIntakesRelations,
-  }
-});
+export const db = drizzle(sql);
