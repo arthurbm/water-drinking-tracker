@@ -62,8 +62,12 @@ export async function HydrationTracker() {
           <form
             action={async () => {
               "use server";
-              await removeCup(user.id, new Date());
-              revalidatePath("/home");
+              try {
+                await removeCup(user.id, new Date());
+                revalidatePath("/home");
+              } catch (error) {
+                console.error(error);
+              }
             }}
           >
             <Button className="w-full" variant="outline">
