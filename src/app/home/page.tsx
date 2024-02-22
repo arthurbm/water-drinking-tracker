@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/app/auth";
 import { HydrationTracker } from "@/components/hydration-tracker";
+import { Button } from "@/components/ui/button";
 
 export default async function ProtectedPage() {
   let session = await auth();
@@ -10,7 +11,7 @@ export default async function ProtectedPage() {
   }
 
   return (
-    <div className="flex flex-col justify-center min-h-screen">
+    <div className="flex min-h-screen flex-col justify-center">
       <HydrationTracker />
       <SignOut />
     </div>
@@ -22,10 +23,15 @@ function SignOut() {
     <form
       action={async () => {
         "use server";
-        await signOut();
+        await signOut({
+          redirectTo: "/login",
+        });
       }}
+      className="flex w-full justify-center"
     >
-      <button type="submit">Sign out</button>
+      <Button variant={"link"} type="submit">
+        Sair
+      </Button>
     </form>
   );
 }

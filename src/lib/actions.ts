@@ -3,7 +3,8 @@ import { db, users, waterIntakes } from "./db";
 import { genSaltSync, hashSync } from "bcrypt-ts";
 
 export async function getUser(email: string) {
-  return await db.select().from(users).where(eq(users.email, email));
+  const [user] = await db.select().from(users).where(eq(users.email, email));
+  return user;
 }
 
 export async function createUser(email: string, password: string) {
