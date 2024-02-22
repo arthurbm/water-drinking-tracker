@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { db, users, waterIntakes } from "./db";
+import { WaterIntake, db, users, waterIntakes } from "./db";
 import { genSaltSync, hashSync } from "bcrypt-ts";
 
 export async function getUser(email: string) {
@@ -15,13 +15,11 @@ export async function createUser(email: string, password: string) {
 }
 
 export async function getDailyIntake(user_id: number, intakeDate: Date) {
-  const dateString = intakeDate.toISOString().split("T")[0];
-
   return await db
     .select()
     .from(waterIntakes)
     .where(
-      and(eq(waterIntakes.user_id, user_id), eq(waterIntakes.date, dateString)),
+      and(eq(waterIntakes.user_id, user_id), eq(waterIntakes.date, intakeDate)),
     );
 }
 
@@ -33,7 +31,7 @@ export async function addCup(user_id: number, date: Date) {
     // If not, create a new entry for today with 1 cup
     return await db
       .insert(waterIntakes)
-      .values({ user_id, date: date.toISOString().split("T")[0], cups: 1 });
+      .values({ user_id, date: date, cups: 1 });
   } else {
     // If yes, increment the cups by 1
     const cups = intake[0]?.cups ?? 0; // Add null check and default value of 0

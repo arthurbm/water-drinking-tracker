@@ -18,12 +18,15 @@ export type NewUser = typeof users.$inferInsert; // insert type
 
 export const waterIntakes = pgTable("water_intakes", {
   id: serial("id").primaryKey(),
-  date: date("date").notNull(),
+  date: date("date", { mode: 'date' }).notNull(),
   cups: integer("cups").notNull(),
   user_id: integer("user_id").references(() => users.id, {
     onDelete: "cascade",
   }),
 });
+
+export type WaterIntake = typeof waterIntakes.$inferSelect; // return type when queried
+export type NewWaterIntake = typeof waterIntakes.$inferInsert; // insert type
 
 export const waterIntakesRelations = relations(waterIntakes, ({ one }) => ({
   users: one(users, {

@@ -13,9 +13,7 @@ export async function HydrationTracker() {
 
   const waterIntakes = await getDailyIntake(user.id, new Date());
 
-  function getDayFromDate(dateString: string) {
-    const date = new Date(dateString);
-
+  function getDayFromDate(date: Date) {
     const days = [
       "Domingo",
       "Segunda",
@@ -34,6 +32,8 @@ export async function HydrationTracker() {
         <h1 className="text-3xl font-bold">Rastreador de hidratação</h1>
         <p className="text-center text-gray-500 dark:text-gray-400">
           Toque nos botões para monitorar sua ingestão de água. Fique hidratada!
+          <br />
+          Um copo equivale a 300 ml
         </p>
       </div>
       <div className="flex flex-col items-center gap-2">
@@ -41,7 +41,8 @@ export async function HydrationTracker() {
           <div className="flex items-center gap-2">
             <GlassWaterIcon className="h-6 w-6" />
             <span className="text-2xl font-semibold">
-              {waterIntakes[0].cups}
+              {/* {waterIntakes?.reduce((acc, curr) => acc + curr.cups, 0) || 0} */}
+              {waterIntakes ? waterIntakes[0].cups : 0}
             </span>
           </div>
           <span className="text-2xl">/ ??</span>
@@ -72,12 +73,12 @@ export async function HydrationTracker() {
         </div>
       </div>
       <div className="flex w-full max-w-sm flex-col gap-4">
-        {waterIntakes.map((waterIntake) => (
+        {waterIntakes?.map((waterIntake) => (
           <div
             key={waterIntake.id}
             className="flex items-center justify-between"
           >
-            <div className="text-sm">{getDayFromDate(waterIntake.date)}</div>
+            <div className="text-base">{getDayFromDate(waterIntake.date)}</div>
             <div className="flex items-center gap-2">
               {/* make a map for GlassWaterIcon to appear the amount that waterIntake.cups has */}
               {Array.from({ length: waterIntake.cups }).map((_, index) => (
