@@ -42,7 +42,7 @@ export async function HydrationTracker() {
             <GlassWaterIcon className="h-6 w-6" />
             <span className="text-2xl font-semibold">
               {/* {waterIntakes?.reduce((acc, curr) => acc + curr.cups, 0) || 0} */}
-              {waterIntakes ? waterIntakes[0].cups : 0}
+              {waterIntakes && waterIntakes[0].cups ? waterIntakes[0].cups : 0}
             </span>
           </div>
           <span className="text-2xl">/ ??</span>
@@ -84,10 +84,10 @@ export async function HydrationTracker() {
           >
             <div className="text-base">{getDayFromDate(waterIntake.date)}</div>
             <div className="flex items-center gap-2">
-              {/* make a map for GlassWaterIcon to appear the amount that waterIntake.cups has */}
-              {Array.from({ length: waterIntake.cups }).map((_, index) => (
-                <GlassWaterIcon key={index} />
-              ))}
+              {waterIntake.cups &&
+                Array.from({ length: waterIntake.cups }).map((_, index) => (
+                  <GlassWaterIcon key={index} />
+                ))}
             </div>
           </div>
         ))}
