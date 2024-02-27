@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/app/auth";
-import { HydrationTracker } from "@/components/hydration-tracker";
+import { HydrationTrackerForm } from "@/components/hydration-tracker-form";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getDailyIntake, getUser } from "@/lib/actions";
 
 export default async function ProtectedPage() {
   let session = await auth();
@@ -11,6 +12,10 @@ export default async function ProtectedPage() {
   if (!session) {
     redirect("/login");
   }
+
+  const user = await getUser(session?.user?.email as string);
+
+  const waterIntakes = await getDailyIntake(user.id, new Date());
 
   return (
     <div className="flex min-h-screen flex-col justify-center">
@@ -25,7 +30,7 @@ export default async function ProtectedPage() {
           </p>
         </div>
         <Suspense fallback={<Skeleton className="h-16 w-1/2 rounded-full" />}>
-          <HydrationTracker />
+          <HydrationTrackerForm userId={user.id} waterIntakes={waterIntakes} />
         </Suspense>
       </div>
       <SignOut />

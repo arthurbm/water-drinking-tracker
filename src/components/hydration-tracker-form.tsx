@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useOptimistic, useTransition } from "react";
-import { revalidatePath } from "next/cache";
-// import { addCupAction } from "@/actions/add-cup";
 import { addCup, removeCup } from "@/lib/actions";
 import { WaterIntake } from "@/lib/db";
-import { GlassWaterIcon } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "./ui/button";
 
 interface HydrationTrackerFormProps {
@@ -17,28 +15,59 @@ export function HydrationTrackerForm({
   userId,
   waterIntakes,
 }: HydrationTrackerFormProps) {
-  const [isPending, startTransition] = useTransition();
+  const formatDateKey = (date: Date) =>
+    `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
 
   const [state, mutate] = useOptimistic(
     waterIntakes,
-    (state, newState: Date) => {
-      const newWaterIntake = state.map((waterIntake) => {
-        if (
-          newState.getDate() === waterIntake.date.getDate() &&
-          newState.getMonth() === waterIntake.date.getMonth() &&
-          newState.getFullYear() === waterIntake.date.getFullYear()
-        ) {
+    (
+      state,
+      { date, operation }: { date: Date; operation: "add" | "remove" },
+    ) => {
+      const newStateKey = formatDateKey(date);
+      let found = false;
+
+      const updatedState = state.map((waterIntake) => {
+        const waterIntakeKey = formatDateKey(waterIntake.date);
+        if (newStateKey === waterIntakeKey) {
+          found = true;
           return {
             ...waterIntake,
-            cups: waterIntake.cups + 1,
+            cups:
+              operation === "add"
+                ? waterIntake.cups + 1
+                : Math.max(waterIntake.cups - 1, 0),
           };
         }
         return waterIntake;
       });
-      console.log(newWaterIntake);
-      return newWaterIntake;
+
+      if (!found && operation === "add") {
+        updatedState.push({
+          date: date,
+          cups: 1,
+          id: Math.random(), // Consider a more robust ID generation strategy for production
+          user_id: userId,
+        });
+      }
+
+      return updatedState;
     },
   );
+
+  const handleAddCup = async () => {
+    mutate({ date: new Date(), operation: "add" });
+    await addCup(userId, new Date());
+  };
+
+  const handleRemoveCup = async () => {
+    mutate({ date: new Date(), operation: "remove" });
+    try {
+      await removeCup(userId, new Date());
+    } catch (error) {
+      toast("Erro ao remover copo");
+    }
+  };
 
   function getDayFromDate(date: Date) {
     const days = [
@@ -55,38 +84,34 @@ export function HydrationTrackerForm({
 
   return (
     <>
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-center ">
+          Total: {state?.reduce((acc, curr) => acc + curr.cups, 0) || 0}
+        </p>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <GlassWaterIcon className="h-6 w-6" />
+            <span className="text-2xl font-semibold">
+              {state && state[0] ? state[0].cups : 0}
+            </span>
+          </div>
+          <span className="text-2xl">/ ??</span>
+        </div>
+      </div>
       <div className="flex w-full max-w-sm flex-col gap-4">
         <div className="grid w-full gap-4 md:grid-cols-2">
-          <form
-            action={async () => {
-              await addCup(userId, new Date());
-            }}
-            // onSubmit={(e) => {
-            //   e.preventDefault();
-            //   startTransition(() => {
-            //     mutate(new Date());
-            //   });
-            // }}
-          >
+          <form action={handleAddCup}>
             <Button className="w-full" variant="outline">
               + 1 Copo
             </Button>
           </form>
-          <form
-            action={async () => {
-              try {
-                await removeCup(userId, new Date());
-              } catch (error) {
-                console.error(error);
-              }
-            }}
-          >
+          <form action={handleRemoveCup}>
             <Button className="w-full" variant="outline">
               - 1 Copo
             </Button>
           </form>{" "}
         </div>
-        {waterIntakes?.map((waterIntake) => (
+        {state?.map((waterIntake) => (
           <div
             key={waterIntake.id}
             className="flex items-center justify-between"
@@ -102,5 +127,25 @@ export function HydrationTrackerForm({
         ))}
       </div>
     </>
+  );
+}
+
+function GlassWaterIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15.2 22H8.8a2 2 0 0 1-2-1.79L5 3h14l-1.81 17.21A2 2 0 0 1 15.2 22Z" />
+      <path d="M6 12a5 5 0 0 1 6 0 5 5 0 0 0 6 0" />
+    </svg>
   );
 }
