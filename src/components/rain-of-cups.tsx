@@ -4,7 +4,7 @@ export const RainOfCups = () => {
   const cupVariants = {
     initial: { y: -100, opacity: 0 },
     animate: {
-      y: [0, 300], // Ajuste para definir o ponto inicial e final da animação
+      y: [0, 400], // Ajuste para definir o ponto inicial e final da animação
       opacity: [0, 1, 0], // Exemplo para fazer o objeto aparecer e depois desaparecer
     },
     exit: { y: 600, opacity: 0 },

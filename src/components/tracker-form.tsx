@@ -7,15 +7,12 @@ import { toast } from "sonner";
 import { RainOfCups } from "./rain-of-cups";
 import { Button } from "./ui/button";
 
-interface HydrationTrackerFormProps {
+interface TrackerFormProps {
   userId: number;
   waterIntakes: WaterIntake[];
 }
 
-export function HydrationTrackerForm({
-  userId,
-  waterIntakes,
-}: HydrationTrackerFormProps) {
+export function TrackerForm({ userId, waterIntakes }: TrackerFormProps) {
   const formatDateKey = (date: Date) =>
     `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
 
@@ -88,9 +85,7 @@ export function HydrationTrackerForm({
   return (
     <>
       <div className="flex flex-col items-center gap-2">
-        <p className="text-center ">
-          Total: {state?.reduce((acc, curr) => acc + curr.cups, 0) || 0}
-        </p>
+        <p className="text-center ">Total: {totalCups}</p>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
             <GlassWaterIcon className="h-6 w-6" />
@@ -128,7 +123,7 @@ export function HydrationTrackerForm({
             </div>
           </div>
         ))}
-        {totalCups >= 5 && <RainOfCups />}
+        {/* {totalCups >= 5 && <RainOfCups />} */}
       </div>
     </>
   );

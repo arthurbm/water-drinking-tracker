@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/app/auth";
-import { HydrationTrackerForm } from "@/components/hydration-tracker-form";
+import { TrackerForm } from "@/components/tracker-form";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { getDailyIntake, getUser } from "@/lib/actions";
 
 export default async function ProtectedPage() {
@@ -29,16 +28,14 @@ export default async function ProtectedPage() {
             Um copo equivale a 300 ml
           </p>
         </div>
-        <Suspense fallback={<Skeleton className="h-16 w-1/2 rounded-full" />}>
-          <HydrationTrackerForm userId={user.id} waterIntakes={waterIntakes} />
-        </Suspense>
+        <TrackerForm userId={user.id} waterIntakes={waterIntakes} />
       </div>
       <SignOut />
     </div>
   );
 }
 
-function SignOut() {
+async function SignOut() {
   return (
     <form
       action={async () => {
