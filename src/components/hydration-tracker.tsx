@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/app/auth";
 import { Button } from "@/components/ui/button";
 import { addCup, getDailyIntake, getUser, removeCup } from "@/lib/actions";
+import { HydrationTrackerForm } from "./hydration-tracker-form";
 
 export async function HydrationTracker() {
   let session = await auth();
@@ -13,86 +14,24 @@ export async function HydrationTracker() {
 
   const waterIntakes = await getDailyIntake(user.id, new Date());
 
-  function getDayFromDate(date: Date) {
-    const days = [
-      "Domingo",
-      "Segunda",
-      "Terça",
-      "Quarta",
-      "Quinta",
-      "Sexta",
-      "Sábado",
-    ];
-    return days[date.getDay()];
-  }
-
   return (
-    <div className="flex flex-col items-center justify-center gap-4 p-4 md:gap-8 md:p-10">
+    <>
       <div className="flex flex-col items-center gap-2">
-        <h1 className="text-3xl font-bold">Rastreador de hidratação</h1>
-        <p className="text-center text-gray-500 dark:text-gray-400">
-          Toque nos botões para monitorar sua ingestão de água. Fique hidratada!
-          <br />
-          Um copo equivale a 300 ml
+        <p className="text-center ">
+          Total: {waterIntakes?.reduce((acc, curr) => acc + curr.cups, 0) || 0}
         </p>
-      </div>
-      <div className="flex flex-col items-center gap-2">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
             <GlassWaterIcon className="h-6 w-6" />
             <span className="text-2xl font-semibold">
-              {/* {waterIntakes?.reduce((acc, curr) => acc + curr.cups, 0) || 0} */}
-              {waterIntakes && waterIntakes[0].cups ? waterIntakes[0].cups : 0}
+              {waterIntakes && waterIntakes[0] ? waterIntakes[0].cups : 0}
             </span>
           </div>
           <span className="text-2xl">/ ??</span>
         </div>
-        <div className="grid w-full gap-4 md:grid-cols-2">
-          <form
-            action={async () => {
-              "use server";
-              await addCup(user.id, new Date());
-              revalidatePath("/home");
-            }}
-          >
-            <Button className="w-full" variant="outline">
-              + 1 Copo
-            </Button>
-          </form>
-          <form
-            action={async () => {
-              "use server";
-              try {
-                await removeCup(user.id, new Date());
-                revalidatePath("/home");
-              } catch (error) {
-                console.error(error);
-              }
-            }}
-          >
-            <Button className="w-full" variant="outline">
-              - 1 Copo
-            </Button>
-          </form>
-        </div>
       </div>
-      <div className="flex w-full max-w-sm flex-col gap-4">
-        {waterIntakes?.map((waterIntake) => (
-          <div
-            key={waterIntake.id}
-            className="flex items-center justify-between"
-          >
-            <div className="text-base">{getDayFromDate(waterIntake.date)}</div>
-            <div className="flex items-center gap-2">
-              {waterIntake.cups &&
-                Array.from({ length: waterIntake.cups }).map((_, index) => (
-                  <GlassWaterIcon key={index} />
-                ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+      <HydrationTrackerForm userId={user.id} waterIntakes={waterIntakes} />
+    </>
   );
 }
 

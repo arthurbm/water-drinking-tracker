@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/app/auth";
 import { HydrationTracker } from "@/components/hydration-tracker";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default async function ProtectedPage() {
   let session = await auth();
@@ -12,7 +14,20 @@ export default async function ProtectedPage() {
 
   return (
     <div className="flex min-h-screen flex-col justify-center">
-      <HydrationTracker />
+      <div className="flex flex-col items-center justify-center gap-4 p-4 md:gap-8 md:p-10">
+        <div className="flex flex-col items-center gap-2">
+          <h1 className="text-3xl font-bold">Rastreador de hidratação</h1>
+          <p className="text-center text-gray-500 dark:text-gray-400">
+            Toque nos botões para monitorar sua ingestão de água. Fique
+            hidratada!
+            <br />
+            Um copo equivale a 300 ml
+          </p>
+        </div>
+        <Suspense fallback={<Skeleton className="h-16 w-1/2 rounded-full" />}>
+          <HydrationTracker />
+        </Suspense>
+      </div>
       <SignOut />
     </div>
   );

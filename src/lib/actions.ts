@@ -1,6 +1,8 @@
+"use server"
 import { and, eq } from "drizzle-orm";
-import { WaterIntake, db, users, waterIntakes } from "./db";
+import { db, users, waterIntakes } from "./db";
 import { genSaltSync, hashSync } from "bcrypt-ts";
+import { revalidatePath } from "next/cache";
 
 export async function getUser(email: string) {
   const [user] = await db.select().from(users).where(eq(users.email, email));
@@ -35,10 +37,11 @@ export async function addCup(user_id: number, date: Date) {
   } else {
     // If yes, increment the cups by 1
     const cups = intake[0]?.cups ?? 0; // Add null check and default value of 0
-    return await db
+    await db
       .update(waterIntakes)
       .set({ cups: cups + 1 })
       .where(eq(waterIntakes.id, intake[0].id));
+    revalidatePath("/home");
   }
 }
 
@@ -48,10 +51,11 @@ export async function removeCup(user_id: number, intakeDate: Date) {
   // Check if the intake record exists and cups are more than 0
   if (intake && intake[0] && intake[0].cups && intake[0].cups > 0) {
     // Decrement the cups by 1
-    return await db
+    await db
       .update(waterIntakes)
       .set({ cups: intake[0].cups - 1 })
       .where(eq(waterIntakes.id, intake[0].id));
+    revalidatePath("/home");
   } else {
     // Handle the case where there is no record for the date or cups are already 0
     // You could return an error message or handle this case as you see fit
