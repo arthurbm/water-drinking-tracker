@@ -4,6 +4,7 @@ import React, { useOptimistic, useTransition } from "react";
 import { addCup, removeCup } from "@/lib/actions";
 import { WaterIntake } from "@/lib/db";
 import { toast } from "sonner";
+import { RainOfCups } from "./rain-of-cups";
 import { Button } from "./ui/button";
 
 interface HydrationTrackerFormProps {
@@ -82,6 +83,8 @@ export function HydrationTrackerForm({
     return days[date.getDay()];
   }
 
+  const totalCups = state?.reduce((acc, curr) => acc + curr.cups, 0) || 0;
+
   return (
     <>
       <div className="flex flex-col items-center gap-2">
@@ -125,6 +128,7 @@ export function HydrationTrackerForm({
             </div>
           </div>
         ))}
+        {totalCups >= 5 && <RainOfCups />}
       </div>
     </>
   );
